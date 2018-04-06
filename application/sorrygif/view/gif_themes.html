@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$info.title}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="__MODULE_CSS__/weui.css"/>
+    <link rel="stylesheet" href="__MODULE_CSS__/weui2.css"/>
+    <script src="__MODULE_JS__/zepto.min.js"></script>
+
+    <style>
+        *{margin:0;padding:0;}
+        .content{padding:0 10px;}
+        .content img{width: 100%;}
+        .content form{margin-top:10px;}
+        .content form label{display: block;color:#c2c2c2;margin-top:10px;}
+        .content form label input{width: 100%;padding:5px 0;}
+
+        .sub{margin-top:30px;}
+        .sub .submit{width: 80px;padding:10px 0;text-align: center;margin:10px auto;background-color: #1f98ca;border-radius: 3px;color: #fff;}
+    </style>
+</head>
+<body ontouchstart>
+    <div class="content">
+        <img src="{$info.icon}">
+        <form id="form">
+            {volist name="info.config.subtitle" id="vo"}
+                <label>{$vo.title}<input type="text" name="sentences[]" placeholder="{$vo.default}"></label>
+            {/volist}
+        </form>
+        <div class="sub">
+            <div class="submit">生成</div>
+        </div>
+    </div>
+    <script>
+        $(".submit").click(function(){
+            var data = $("#form").serialize();
+            $.showLoading();
+            $.ajax({
+                url:"<?php echo url('api/make_gif',['id'=>$info['id']]); ?>",
+                data:data,
+                type:"POST",
+                success:function(_data){
+                    $.hideLoading();
+                    if(_data.code == 200){
+                        window.location.href = _data.data.path;
+                    }else{
+                        $.toptips(_data.msg);
+                    }
+                },
+                error:function(){
+                    $.hideLoading();
+                    $.toptips("网络错误");
+                }
+            })
+        });
+    </script>
+</body>
+</html>
